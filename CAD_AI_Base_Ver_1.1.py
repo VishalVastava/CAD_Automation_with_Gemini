@@ -21,7 +21,7 @@ from pyautocad import Autocad, APoint
 import traceback
 
 # ========== CONFIG ========== #
-GEMINI_API_KEY = "AIzaSyDbG38EbHSqY46F208LJlN7YngrvIllOm0"  # Replace this with your actual API key
+GEMINI_API_KEY = "AIzaSyDbG38EbHSqY46F208LJlN7YngrvIllOm"  # Replace this with your actual API key
 # Gemini Studio:  https://aistudio.google.com/app/apikey
 
 # ========== INIT Gemini ========== #
