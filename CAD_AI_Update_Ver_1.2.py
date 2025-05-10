@@ -9,7 +9,7 @@ import datetime
 import os
 
 # ========== CONFIG ========== #
-GEMINI_API_KEY = "AIzaSyDbG38EbHSqY46F208LJlN7YngrvIllOm0"
+GEMINI_API_KEY = "AIzaSyDbG38EbHSqY46F208LJlN7YngrvIllOm"
 LOG_FILE = "autocad_gemini_log.txt"
 CODE_HISTORY_FILE = "code_history.txt"
 PROMPT_MEMORY_FILE = "prompt_memory.txt"
