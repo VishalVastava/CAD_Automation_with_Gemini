@@ -1,0 +1,146 @@
+
+--- 2025-05-10 09:34:20 ---
+```python
+from pyautocad import Autocad, APoint
+import math
+
+acad = Autocad(create_if_not_exists=True)
+acad.prompt("nHello, Autocad " + acad.doc.Name + "n")
+
+SCALE = 0.0254  # Conversion factor from inches to meters (1 inch = 0.0254 meters)
+SQ_FT_TO_SQ_M = 0.092903  # Conversion factor from sq. ft to sq. m
+
+def create_rectangle(p1, p2):
+    """Creates a rectangle using two corner points."""
+    p3 = APoint(p2.x, p1.y)
+    p4 = APoint(p1.x, p2.y)
+    return acad.model.AddPolyline([p1, p4, p2, p3, p1])
+
+def add_dimension(p1, p2, offset, text_height=0.15):
+    """Adds a linear dimension."""
+    dim = acad.model.AddDimAligned(p1, p2, offset)
+    dim.TextHeight = text_height
+    return dim
+
+def add_text(point, text, height=0.15):
+    """Adds text at a given point."""
+    text_obj = acad.model.AddText(text, point, height)
+    return text_obj
+
+def calculate_area(points):
+    """Calculates the area of a polygon given its vertices."""
+    area = 0.0
+    n = len(points)
+    for i in range(n):
+        j = (i + 1) % n
+        area += (points[i].x * points[j].y) - (points[j].x * points[i].y)
+    return abs(area / 2.0)
+
+def create_2bhk(insert_point=APoint(0, 0)):
+    """Creates a 2BHK layout."""
+
+    # Overall dimensions (approximate, will be adjusted)
+    total_area_sqft = 1020
+    aspect_ratio = 1.5  # Approximate length/width ratio
+    width_approx = math.sqrt(total_area_sqft / aspect_ratio)
+    length_approx = width_approx * aspect_ratio
+
+    # Convert approximate dimensions to meters
+    overall_width = width_approx * SCALE
+    overall_length = length_approx * SCALE
+
+    # Define starting point
+    start_point = insert_point
+
+    # Create outer walls
+    outer_rect = create_rectangle(start_point, APoint(start_point.x + overall_length, start_point.y + overall_width))
+
+    # Define room sizes (adjust as needed)
+    living_room_width = overall_width * 0.6
+    living_room_length = overall_length * 0.5
+
+    bedroom1_width = overall_width * 0.4
+    bedroom1_length = overall_length * 0.4
+
+    bedroom2_width = overall_width * 0.4
+    bedroom2_length = overall_length * 0.4
+
+    bathroom_width = overall_width * 0.2
+    bathroom_length = overall_length * 0.2
+
+    balcony_width = overall_width * 0.15  #Balcony for rooms and hall
+    balcony_length = overall_length * 0.15
+
+
+    # Create Living Room
+    living_room_start = start_point
+    living_room_end = APoint(living_room_start.x + living_room_length, living_room_start.y + living_room_width)
+    living_room_rect = create_rectangle(living_room_start, living_room_end)
+
+    #Create balcony for living room
+    living_room_balcony_start = APoint(living_room_start.x, living_room_end.y)
+    living_room_balcony_end = APoint(living_room_start.x + balcony_length, living_room_end.y + balcony_width)
+
+    living_room_balcony = create_rectangle(living_room_balcony_start, living_room_balcony_end)
+
+
+
+    # Create Bedroom 1
+    bedroom1_start = APoint(living_room_start.x, living_room_end.y)
+    bedroom1_end = APoint(bedroom1_start.x + bedroom1_length, bedroom1_start.y + bedroom1_width)
+    bedroom1_rect = create_rectangle(bedroom1_start, bedroom1_end)
+
+    #Create balcony for Bedroom 1
+    bedroom1_balcony_start = APoint(bedroom1_start.x, bedroom1_end.y)
+    bedroom1_balcony_end = APoint(bedroom1_start.x+ balcony_length, bedroom1_end.y + balcony_width)
+
+    bedroom1_balcony = create_rectangle(bedroom1_balcony_start, bedroom1_balcony_end)
+
+
+
+
+    # Create Bedroom 2
+    bedroom2_start = APoint(living_room_end.x, living_room_start.y)
+    bedroom2_end = APoint(bedroom2_start.x + bedroom2_length, bedroom2_start.y + bedroom2_width)
+    bedroom2_rect = create_rectangle(bedroom2_start, bedroom2_end)
+
+
+    #Create balcony for Bedroom 2
+    bedroom2_balcony_start = APoint(bedroom2_start.x, bedroom2_end.y)
+    bedroom2_balcony_end = APoint(bedroom2_start.x + balcony_length, bedroom2_end.y + balcony_width)
+
+    bedroom2_balcony = create_rectangle(bedroom2_balcony_start, bedroom2_balcony_end)
+
+
+    # Create Bathroom 1 (near Bedroom 1)
+    bathroom1_start = APoint(bedroom1_start.x + bedroom1_length, bedroom1_start.y)
+    bathroom1_end = APoint(bathroom1_start.x + bathroom_length, bathroom1_start.y + bathroom_width)
+    bathroom1_rect = create_rectangle(bathroom1_start, bathroom1_end)
+
+    # Create Bathroom 2 (near Bedroom 2)
+    bathroom2_start = APoint(bedroom2_start.x + bedroom2_length, bedroom2_start.y)
+    bathroom2_end = APoint(bathroom2_start.x + bathroom_length, bathroom2_start.y + bathroom_width)
+    bathroom2_rect = create_rectangle(bathroom2_start, bathroom2_end)
+
+
+    # Dimensions and labels (example - add more as needed)
+    add_dimension(living_room_start, APoint(living_room_start.x + living_room_length, living_room_start.y), -0.2)
+    add_dimension(living_room_start, APoint(living_room_start.x, living_room_start.y + living_room_width), -0.2)
+    living_room_area_sqft = calculate_area([living_room_start,APoint(living_room_end.x, living_room_start.y), living_room_end,APoint(living_room_start.x, living_room_end.y)]) / SQ_FT_TO_SQ_M
+    add_text(APoint(living_room_start.x + living_room_length/2, living_room_start.y + living_room_width/2), f"Living Room ({living_room_area_sqft:.0f} sq.ft.)")
+
+    bedroom1_area_sqft = calculate_area([bedroom1_start, APoint(bedroom1_end.x, bedroom1_start.y), bedroom1_end, APoint(bedroom1_start.x, bedroom1_end.y)])/ SQ_FT_TO_SQ_M
+    add_text(APoint(bedroom1_start.x + bedroom1_length/2, bedroom1_start.y + bedroom1_width/2), f"Bedroom 1 ({bedroom1_area_sqft:.0f} sq.ft.)")
+
+    bedroom2_area_sqft = calculate_area([bedroom2_start,APoint(bedroom2_end.x, bedroom2_start.y), bedroom2_end,APoint(bedroom2_start.x, bedroom2_end.y)]) / SQ_FT_TO_SQ_M
+    add_text(APoint(bedroom2_start.x + bedroom2_length/2, bedroom2_start.y + bedroom2_width/2), f"Bedroom 2 ({bedroom2_area_sqft:.0f} sq.ft.)")
+
+    bathroom1_area_sqft = calculate_area([bathroom1_start,APoint(bathroom1_end.x, bathroom1_start.y), bathroom1_end,APoint(bathroom1_start.x, bathroom1_end.y)]) / SQ_FT_TO_SQ_M
+    add_text(APoint(bathroom1_start.x + bathroom_length/2, bathroom1_start.y + bathroom_width/2), f"Bathroom 1 ({bathroom1_area_sqft:.0f} sq.ft.)")
+
+    bathroom2_area_sqft = calculate_area([bathroom2_start,APoint(bathroom2_end.x, bathroom2_start.y), bathroom2_end,APoint(bathroom2_start.x, bathroom2_end.y)]) / SQ_FT_TO_SQ_M
+    add_text(APoint(bathroom2_start.x + bathroom_length/2, bathroom2_start.y + bathroom_width/2), f"Bathroom 2 ({bathroom2_area_sqft:.0f} sq.ft.)")
+
+
+create_2bhk()
+```
