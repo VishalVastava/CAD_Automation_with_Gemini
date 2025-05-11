@@ -16,7 +16,7 @@ PROMPT_MEMORY_FILE = "prompt_memory.txt"
 
 # ========== INIT Gemini ========== #
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-2.0-pro")
+model = genai.GenerativeModel("gemini-2.0-flash")
 
 # ========== INIT AutoCAD ========== #
 acad = Autocad(create_if_not_exists=True)
