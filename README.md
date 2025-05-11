@@ -74,7 +74,7 @@ GEMINI_API_KEY = "your_api_key_here"
 
 ## 📄 License
 
-MIT License. See `LICENSE` file (add one if needed).
+Apache 2.0 License. See `LICENSE` file (add one if needed).
 
 ---
 
